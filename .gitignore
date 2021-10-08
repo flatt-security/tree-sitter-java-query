@@ -9,3 +9,4 @@ test.java
 /examples/guava
 /examples/RxJava
 /target/
+*.wasm

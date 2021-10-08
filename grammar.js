@@ -70,7 +70,17 @@ module.exports = grammar({
   word: $ => $.identifier,
 
   rules: {
-    program: $ => repeat($.statement),
+    // query syntax for shisho
+    shisho_metavariable: ($) => seq(":[", $.shisho_metavariable_name, "]"),
+    shisho_ellipsis: ($) => ":[...]",
+    shisho_ellipsis_metavariable: ($) =>
+      seq(":[", "...", $.shisho_metavariable_name, "]"),
+    shisho_metavariable_name: ($) => /[A-Z_][A-Z_0-9]*/,
+
+    program: $ => repeat(choice($.statement,
+      $.shisho_ellipsis,
+      $.shisho_ellipsis_metavariable
+    )),
 
     // Literals
 
@@ -113,9 +123,9 @@ module.exports = grammar({
 
     decimal_floating_point_literal: $ => token(choice(
       seq(DIGITS, '.', optional(DIGITS), optional(seq((/[eE]/), optional(choice('-', '+')), DIGITS)), optional(/[fFdD]/)),
-      seq('.', DIGITS, optional(seq((/[eE]/), optional(choice('-','+')), DIGITS)), optional(/[fFdD]/)),
-      seq(DIGITS, /[eEpP]/, optional(choice('-','+')), DIGITS, optional(/[fFdD]/)),
-      seq(DIGITS, optional(seq((/[eE]/), optional(choice('-','+')), DIGITS)), (/[fFdD]/))
+      seq('.', DIGITS, optional(seq((/[eE]/), optional(choice('-', '+')), DIGITS)), optional(/[fFdD]/)),
+      seq(DIGITS, /[eEpP]/, optional(choice('-', '+')), DIGITS, optional(/[fFdD]/)),
+      seq(DIGITS, optional(seq((/[eE]/), optional(choice('-', '+')), DIGITS)), (/[fFdD]/))
     )),
 
     hex_floating_point_literal: $ => token(seq(
@@ -126,7 +136,7 @@ module.exports = grammar({
       ),
       optional(seq(
         /[eEpP]/,
-        optional(choice('-','+')),
+        optional(choice('-', '+')),
         DIGITS,
         optional(/[fFdD]/)
       ))
@@ -157,6 +167,7 @@ module.exports = grammar({
     // Expressions
 
     expression: $ => choice(
+      $.shisho_metavariable,
       $.assignment_expression,
       $.binary_expression,
       $.instanceof_expression,
@@ -166,18 +177,19 @@ module.exports = grammar({
       $.primary_expression,
       $.unary_expression,
       $.cast_expression,
-      prec(PREC.SWITCH_EXP, $.switch_expression), 
+      prec(PREC.SWITCH_EXP, $.switch_expression),
     ),
 
     cast_expression: $ => prec(PREC.CAST, seq(
       '(',
-      sep1(field('type', $._type), '&'),
+      sep1(field('type', choice($._type, $.shisho_ellipsis, $.shisho_ellipsis_metavariable)), '&'),
       ')',
       field('value', $.expression)
     )),
 
     assignment_expression: $ => prec.right(PREC.ASSIGN, seq(
       field('left', choice(
+        $.shisho_metavariable,
         $.identifier,
         $._reserved_identifier,
         $.field_access,
@@ -189,32 +201,32 @@ module.exports = grammar({
 
     binary_expression: $ => choice(
       ...[
-      ['>', PREC.REL],
-      ['<', PREC.REL],
-      ['>=', PREC.REL],
-      ['<=', PREC.REL],
-      ['==', PREC.EQUALITY],
-      ['!=', PREC.EQUALITY],
-      ['&&', PREC.AND],
-      ['||', PREC.OR],
-      ['+', PREC.ADD],
-      ['-', PREC.ADD],
-      ['*', PREC.MULT],
-      ['/', PREC.MULT],
-      ['&', PREC.BIT_AND],
-      ['|', PREC.BIT_OR],
-      ['^', PREC.BIT_XOR],
-      ['%', PREC.MULT],
-      ['<<', PREC.SHIFT],
-      ['>>', PREC.SHIFT],
-      ['>>>', PREC.SHIFT],
-    ].map(([operator, precedence]) =>
-      prec.left(precedence, seq(
-        field('left', $.expression),
-        field('operator', operator),
-        field('right', $.expression)
-      ))
-    )),
+        ['>', PREC.REL],
+        ['<', PREC.REL],
+        ['>=', PREC.REL],
+        ['<=', PREC.REL],
+        ['==', PREC.EQUALITY],
+        ['!=', PREC.EQUALITY],
+        ['&&', PREC.AND],
+        ['||', PREC.OR],
+        ['+', PREC.ADD],
+        ['-', PREC.ADD],
+        ['*', PREC.MULT],
+        ['/', PREC.MULT],
+        ['&', PREC.BIT_AND],
+        ['|', PREC.BIT_OR],
+        ['^', PREC.BIT_XOR],
+        ['%', PREC.MULT],
+        ['<<', PREC.SHIFT],
+        ['>>', PREC.SHIFT],
+        ['>>>', PREC.SHIFT],
+      ].map(([operator, precedence]) =>
+        prec.left(precedence, seq(
+          field('left', $.expression),
+          field('operator', operator),
+          field('right', $.expression)
+        ))
+      )),
 
     instanceof_expression: $ => prec(PREC.REL, seq(
       field('left', $.expression),
@@ -224,7 +236,7 @@ module.exports = grammar({
 
     lambda_expression: $ => seq(
       field('parameters', choice(
-        $.identifier, $.formal_parameters, $.inferred_parameters
+        $.identifier, $.shisho_metavariable, $.formal_parameters, $.inferred_parameters
       )),
       '->',
       field('body', choice($.expression, $.block))
@@ -232,7 +244,7 @@ module.exports = grammar({
 
     inferred_parameters: $ => seq(
       '(',
-      commaSep1($.identifier),
+      commaSep1($.identifier, $.shisho_metavariable, $.shisho_ellipsis_metavariable, $.shisho_ellipsis),
       ')'
     ),
 
@@ -265,6 +277,7 @@ module.exports = grammar({
     )),
 
     primary_expression: $ => choice(
+      $.shisho_metavariable,
       $._literal,
       $.class_literal,
       $.this,
@@ -284,7 +297,7 @@ module.exports = grammar({
       field('type', $._simple_type),
       choice(
         seq(
-          field('dimensions', repeat1($.dimensions_expr)),
+          field('dimensions', repeat1(choice($.dimensions_expr, $.shisho_ellipsis, $.shisho_ellipsis_metavariable))),
           field('dimensions', optional($.dimensions))
         ),
         seq(
@@ -294,7 +307,7 @@ module.exports = grammar({
       )
     )),
 
-    dimensions_expr: $ => seq(repeat($._annotation), '[', $.expression, ']'),
+    dimensions_expr: $ => seq(repeat(choice($._annotation, $.shisho_ellipsis, $.shisho_ellipsis_metavariable)), '[', $.expression, ']'),
 
     parenthesized_expression: $ => seq('(', $.expression, ')'),
 
@@ -314,13 +327,13 @@ module.exports = grammar({
     )),
 
     field_access: $ => seq(
-      field('object', choice($.primary_expression, $.super)),
+      field('object', choice($.primary_expression, $.super, $.shisho_metavariable)),
       optional(seq(
         '.',
         $.super
       )),
       '.',
-      field('field', choice($.identifier, $._reserved_identifier, $.this))
+      field('field', choice($.identifier, $.shisho_metavariable, $._reserved_identifier, $.this))
     ),
 
     array_access: $ => seq(
@@ -332,33 +345,33 @@ module.exports = grammar({
 
     method_invocation: $ => seq(
       choice(
-        field('name', choice($.identifier, $._reserved_identifier)),
+        field('name', choice($.shisho_metavariable, $.identifier, $._reserved_identifier)),
         seq(
-          field('object', choice($.primary_expression, $.super)),
+          field('object', choice($.primary_expression, $.super, $.shisho_metavariable)),
           '.',
           optional(seq(
             $.super,
             '.'
           )),
           field('type_arguments', optional($.type_arguments)),
-          field('name', choice($.identifier, $._reserved_identifier)),
+          field('name', choice($.shisho_metavariable, $.identifier, $._reserved_identifier)),
         )
       ),
       field('arguments', $.argument_list)
     ),
 
-    argument_list: $ => seq('(', commaSep($.expression), ')'),
+    argument_list: $ => seq('(', commaSep(choice($.shisho_ellipsis, $.shisho_ellipsis_metavariable, $.expression)), ')'),
 
     method_reference: $ => seq(
-      choice($._type, $.primary_expression, $.super),
+      choice($._type, $.primary_expression, $.super, $.shisho_metavariable),
       '::',
       optional($.type_arguments),
-      choice('new', $.identifier)
+      choice('new', $.identifier, $.shisho_metavariable)
     ),
 
     type_arguments: $ => seq(
       '<',
-      commaSep(choice($._type, $.wildcard)),
+      commaSep(choice($._type, $.wildcard, $.shisho_ellipsis, $.shisho_ellipsis_metavariable)),
       '>'
     ),
 
@@ -374,7 +387,7 @@ module.exports = grammar({
     ),
 
     dimensions: $ => prec.right(repeat1(
-      seq(repeat($._annotation), '[', ']')
+      choice(seq(repeat($._annotation), '[', ']'), $.shisho_ellipsis, $.shisho_ellipsis_metavariable)
     )),
 
     switch_expression: $ => seq(
@@ -386,31 +399,32 @@ module.exports = grammar({
     switch_block: $ => seq(
       '{',
       choice(
-        repeat($.switch_block_statement_group), 
+        repeat($.switch_block_statement_group),
         repeat($.switch_rule)
       ),
       '}'
     ),
 
-    switch_block_statement_group: $ => prec.left (seq(
-        repeat1(seq($.switch_label, ':')),
-        repeat($.statement),
+    switch_block_statement_group: $ => prec.left(seq(
+      repeat1(choice(seq($.switch_label, ':'), $.shisho_ellipsis, $.shisho_ellipsis_metavariable)),
+      repeat(choice($.statement, $.shisho_ellipsis, $.shisho_ellipsis_metavariable)),
     )),
 
     switch_rule: $ => seq(
       $.switch_label,
       '->',
       choice($.expression_statement, $.throw_statement, $.block)
-     ),
+    ),
 
     switch_label: $ => choice(
-      seq('case', commaSep1($.expression)),
+      seq('case', commaSep1(choice($.expression, $.shisho_ellipsis, $.shisho_ellipsis_metavariable))),
       'default'
     ),
 
     // Statements
 
     statement: $ => choice(
+      $.shisho_metavariable,
       $.declaration,
       $.expression_statement,
       $.labeled_statement,
@@ -435,7 +449,7 @@ module.exports = grammar({
     ),
 
     block: $ => seq(
-      '{', repeat($.statement), '}'
+      '{', repeat(choice($.statement, $.shisho_ellipsis, $.shisho_ellipsis_metavariable)), '}'
     ),
 
     expression_statement: $ => seq(
@@ -444,7 +458,7 @@ module.exports = grammar({
     ),
 
     labeled_statement: $ => seq(
-      $.identifier, ':', $.statement
+      choice($.identifier, $.shisho_metavariable), ':', $.statement
     ),
 
     assert_statement: $ => choice(
@@ -460,9 +474,9 @@ module.exports = grammar({
       ';'
     ),
 
-    break_statement: $ => seq('break', optional($.identifier), ';'),
+    break_statement: $ => seq('break', optional(choice($.identifier, $.shisho_metavariable)), ';'),
 
-    continue_statement: $ => seq('continue', optional($.identifier), ';'),
+    continue_statement: $ => seq('continue', optional(choice($.identifier, $.shisho_metavariable)), ';'),
 
     return_statement: $ => seq(
       'return',
@@ -520,7 +534,8 @@ module.exports = grammar({
     ),
 
     resource_specification: $ => seq(
-      '(', sep1($.resource, ';'), optional(';'), ')'
+      // TODO (y0n3uchy): fix this
+      '(', sep1(choice($.resource, $.shisho_ellipsis, $.shisho_ellipsis_metavariable), ';'), optional(';'), ')'
     ),
 
     resource: $ => choice(
@@ -531,7 +546,7 @@ module.exports = grammar({
         '=',
         field('value', $.expression)
       ),
-      $.identifier,
+      choice($.identifier, $.shisho_metavariable),
       $.field_access
     ),
 
@@ -577,6 +592,7 @@ module.exports = grammar({
     // Annotations
 
     _annotation: $ => choice(
+      $.shisho_metavariable,
       $.marker_annotation,
       $.annotation
     ),
@@ -596,13 +612,13 @@ module.exports = grammar({
       '(',
       choice(
         $._element_value,
-        commaSep($.element_value_pair),
+        commaSep(choice($.element_value_pair, $.shisho_ellipsis, $.shisho_ellipsis_metavariable)),
       ),
       ')'
     ),
 
     element_value_pair: $ => seq(
-      field('key', $.identifier),
+      field('key', choice($.identifier, $.shisho_metavariable)),
       '=',
       field('value', $._element_value)
     ),
@@ -615,7 +631,7 @@ module.exports = grammar({
 
     element_value_array_initializer: $ => seq(
       '{',
-      commaSep($._element_value),
+      commaSep(choice($._element_value, $.shisho_ellipsis, $.shisho_ellipsis_metavariable)),
       optional(','),
       '}'
     ),
@@ -642,7 +658,7 @@ module.exports = grammar({
 
     module_body: $ => seq(
       '{',
-      repeat($.module_directive),
+      repeat(choice($.module_directive, $.shisho_ellipsis, $.shisho_ellipsis_metavariable)),
       '}'
     ),
 
@@ -679,14 +695,14 @@ module.exports = grammar({
     enum_declaration: $ => seq(
       optional($.modifiers),
       'enum',
-      field('name', $.identifier),
+      field('name', choice($.identifier, $.shisho_metavariable)),
       field('interfaces', optional($.super_interfaces)),
       field('body', $.enum_body)
     ),
 
     enum_body: $ => seq(
       '{',
-      commaSep($.enum_constant),
+      commaSep(choice($.enum_constant, $.shisho_ellipsis_metavariable, $.shisho_ellipsis)),
       optional(','),
       optional($.enum_body_declarations),
       '}'
@@ -699,7 +715,7 @@ module.exports = grammar({
 
     enum_constant: $ => (seq(
       optional($.modifiers),
-      field('name', $.identifier),
+      field('name', choice($.identifier, $.shisho_metavariable)),
       field('arguments', optional($.argument_list)),
       field('body', optional($.class_body))
     )),
@@ -707,7 +723,7 @@ module.exports = grammar({
     class_declaration: $ => seq(
       optional($.modifiers),
       'class',
-      field('name', $.identifier),
+      field('name', choice($.identifier, $.shisho_metavariable)),
       optional(field('type_parameters', $.type_parameters)),
       optional(field('superclass', $.superclass)),
       optional(field('interfaces', $.super_interfaces)),
@@ -715,6 +731,9 @@ module.exports = grammar({
     ),
 
     modifiers: $ => repeat1(choice(
+      $.shisho_ellipsis,
+      $.shisho_ellipsis_metavariable,
+      $.shisho_metavariable,
       $._annotation,
       'public',
       'protected',
@@ -731,16 +750,16 @@ module.exports = grammar({
     )),
 
     type_parameters: $ => seq(
-      '<', commaSep1($.type_parameter), '>'
+      '<', commaSep1(choice($.type_parameter, $.shisho_ellipsis, $.shisho_metavariable)), '>'
     ),
 
     type_parameter: $ => seq(
       repeat($._annotation),
-      $.identifier,
+      choice($.identifier, $.shisho_metavariable),
       optional($.type_bound)
     ),
 
-    type_bound: $ => seq('extends', $._type, repeat(seq('&', $._type))),
+    type_bound: $ => seq('extends', $._type, repeat(seq('&', choice($._type, $.shisho_ellipsis, $.shisho_ellipsis_metavariable)))),
 
     superclass: $ => seq(
       'extends',
@@ -754,7 +773,7 @@ module.exports = grammar({
 
     interface_type_list: $ => seq(
       $._type,
-      repeat(seq(',', $._type))
+      repeat(seq(',', choice($._type, $.shisho_ellipsis, $.shisho_ellipsis_metavariable)))
     ),
 
     class_body: $ => seq(
@@ -798,7 +817,7 @@ module.exports = grammar({
     constructor_body: $ => seq(
       '{',
       optional($.explicit_constructor_invocation),
-      repeat($.statement),
+      repeat(choice($.statement, $.shisho_ellipsis, $.shisho_ellipsis_metavariable)),
       '}'
     ),
 
@@ -820,6 +839,7 @@ module.exports = grammar({
     ),
 
     _name: $ => choice(
+      $.shisho_metavariable,
       $.identifier,
       $._reserved_identifier,
       $.scoped_identifier
@@ -828,7 +848,7 @@ module.exports = grammar({
     scoped_identifier: $ => seq(
       field('scope', $._name),
       '.',
-      field('name', $.identifier)
+      field('name', choice($.identifier, $.shisho_metavariable))
     ),
 
     field_declaration: $ => seq(
@@ -841,20 +861,23 @@ module.exports = grammar({
     record_declaration: $ => seq(
       optional($.modifiers),
       'record',
-      field('name', $.identifier),
+      field('name', choice($.identifier, $.shisho_metavariable)),
       field('parameters', $.formal_parameters),
-      field('body', $.class_body) 
+      field('body', $.class_body)
     ),
 
     annotation_type_declaration: $ => seq(
       optional($.modifiers),
       '@interface',
-      field('name', $.identifier),
+      field('name', choice($.identifier, $.shisho_metavariable)),
       field('body', $.annotation_type_body)
     ),
 
     annotation_type_body: $ => seq(
       '{', repeat(choice(
+        $.shisho_ellipsis,
+        $.shisho_ellipsis_metavariable,
+        $.shisho_metavariable,
         $.annotation_type_element_declaration,
         $.constant_declaration,
         $.class_declaration,
@@ -867,7 +890,7 @@ module.exports = grammar({
     annotation_type_element_declaration: $ => seq(
       optional($.modifiers),
       field('type', $._unannotated_type),
-      field('name', $.identifier),
+      field('name', choice($.identifier, $.shisho_metavariable)),
       '(', ')',
       field('dimensions', optional($.dimensions)),
       optional($._default_value),
@@ -882,7 +905,7 @@ module.exports = grammar({
     interface_declaration: $ => seq(
       optional($.modifiers),
       'interface',
-      field('name', $.identifier),
+      field('name', choice($.identifier, $.shisho_metavariable)),
       field('type_parameters', optional($.type_parameters)),
       optional($.extends_interfaces),
       field('body', $.interface_body)
@@ -896,6 +919,9 @@ module.exports = grammar({
     interface_body: $ => seq(
       '{',
       repeat(choice(
+        $.shisho_ellipsis,
+        $.shisho_ellipsis_metavariable,
+        $.shisho_metavariable,
         $.constant_declaration,
         $.enum_declaration,
         $.method_declaration,
@@ -924,7 +950,7 @@ module.exports = grammar({
     ),
 
     _variable_declarator_id: $ => seq(
-      field('name', choice($.identifier, $._reserved_identifier)),
+      field('name', choice($.shisho_metavariable, $.identifier, $._reserved_identifier)),
       field('dimensions', optional($.dimensions))
     ),
 
@@ -935,7 +961,7 @@ module.exports = grammar({
 
     array_initializer: $ => seq(
       '{',
-      commaSep($._variable_initializer),
+      commaSep(choice($._variable_initializer, $.shisho_ellipsis, $.shisho_ellipsis_metavariable)),
       optional(','),
       '}'
     ),
@@ -943,6 +969,7 @@ module.exports = grammar({
     // Types
 
     _type: $ => choice(
+      $.shisho_metavariable,
       $._unannotated_type,
       $.annotated_type
     ),
@@ -957,7 +984,7 @@ module.exports = grammar({
       $.integral_type,
       $.floating_point_type,
       $.boolean_type,
-      alias($.identifier, $.type_identifier),
+      choice(alias($.identifier, $.type_identifier), $.shisho_metavariable),
       $.scoped_type_identifier,
       $.generic_type
     ),
@@ -969,18 +996,18 @@ module.exports = grammar({
 
     scoped_type_identifier: $ => seq(
       choice(
-        alias($.identifier, $.type_identifier),
+        choice(alias($.identifier, $.type_identifier), $.shisho_metavariable),
         $.scoped_type_identifier,
         $.generic_type
       ),
       '.',
       repeat($._annotation),
-      alias($.identifier, $.type_identifier)
+      choice(alias($.identifier, $.type_identifier), $.shisho_metavariable),
     ),
 
     generic_type: $ => prec.dynamic(PREC.GENERIC, seq(
       choice(
-        alias($.identifier, $.type_identifier),
+        choice(alias($.identifier, $.type_identifier), $.shisho_metavariable),
         $.scoped_type_identifier
       ),
       $.type_arguments
@@ -1019,7 +1046,7 @@ module.exports = grammar({
     ),
 
     _method_declarator: $ => seq(
-      field('name', choice($.identifier, $._reserved_identifier)),
+      field('name', choice($.identifier, $.shisho_metavariable, $._reserved_identifier)),
       field('parameters', $.formal_parameters),
       field('dimensions', optional($.dimensions))
     ),
@@ -1040,7 +1067,7 @@ module.exports = grammar({
     receiver_parameter: $ => seq(
       repeat($._annotation),
       $._unannotated_type,
-      optional(seq($.identifier, '.')),
+      optional(seq(choice($.identifier, $.shisho_metavariable), '.')),
       $.this
     ),
 
@@ -1052,7 +1079,7 @@ module.exports = grammar({
     ),
 
     throws: $ => seq(
-      'throws', commaSep1($._type)
+      'throws', commaSep1(choice($._type, $.shisho_ellipsis, $.shisho_ellipsis_metavariable))
     ),
 
     local_variable_declaration: $ => seq(
@@ -1092,7 +1119,7 @@ module.exports = grammar({
   }
 });
 
-function sep1 (rule, separator) {
+function sep1(rule, separator) {
   return seq(rule, repeat(seq(separator, rule)));
 }
 

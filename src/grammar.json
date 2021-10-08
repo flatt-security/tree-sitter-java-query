@@ -2,11 +2,70 @@
   "name": "java",
   "word": "identifier",
   "rules": {
+    "shisho_metavariable": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": ":["
+        },
+        {
+          "type": "SYMBOL",
+          "name": "shisho_metavariable_name"
+        },
+        {
+          "type": "STRING",
+          "value": "]"
+        }
+      ]
+    },
+    "shisho_ellipsis": {
+      "type": "STRING",
+      "value": ":[...]"
+    },
+    "shisho_ellipsis_metavariable": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": ":["
+        },
+        {
+          "type": "STRING",
+          "value": "..."
+        },
+        {
+          "type": "SYMBOL",
+          "name": "shisho_metavariable_name"
+        },
+        {
+          "type": "STRING",
+          "value": "]"
+        }
+      ]
+    },
+    "shisho_metavariable_name": {
+      "type": "PATTERN",
+      "value": "[A-Z_][A-Z_0-9]*"
+    },
     "program": {
       "type": "REPEAT",
       "content": {
-        "type": "SYMBOL",
-        "name": "statement"
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "statement"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "shisho_ellipsis"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "shisho_ellipsis_metavariable"
+          }
+        ]
       }
     },
     "_literal": {
@@ -1106,6 +1165,10 @@
       "members": [
         {
           "type": "SYMBOL",
+          "name": "shisho_metavariable"
+        },
+        {
+          "type": "SYMBOL",
           "name": "assignment_expression"
         },
         {
@@ -1167,8 +1230,21 @@
                 "type": "FIELD",
                 "name": "type",
                 "content": {
-                  "type": "SYMBOL",
-                  "name": "_type"
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "SYMBOL",
+                      "name": "_type"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "shisho_ellipsis"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "shisho_ellipsis_metavariable"
+                    }
+                  ]
                 }
               },
               {
@@ -1184,8 +1260,21 @@
                       "type": "FIELD",
                       "name": "type",
                       "content": {
-                        "type": "SYMBOL",
-                        "name": "_type"
+                        "type": "CHOICE",
+                        "members": [
+                          {
+                            "type": "SYMBOL",
+                            "name": "_type"
+                          },
+                          {
+                            "type": "SYMBOL",
+                            "name": "shisho_ellipsis"
+                          },
+                          {
+                            "type": "SYMBOL",
+                            "name": "shisho_ellipsis_metavariable"
+                          }
+                        ]
                       }
                     }
                   ]
@@ -1220,6 +1309,10 @@
             "content": {
               "type": "CHOICE",
               "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "shisho_metavariable"
+                },
                 {
                   "type": "SYMBOL",
                   "name": "identifier"
@@ -1983,6 +2076,10 @@
               },
               {
                 "type": "SYMBOL",
+                "name": "shisho_metavariable"
+              },
+              {
+                "type": "SYMBOL",
                 "name": "formal_parameters"
               },
               {
@@ -2265,6 +2362,10 @@
       "members": [
         {
           "type": "SYMBOL",
+          "name": "shisho_metavariable"
+        },
+        {
+          "type": "SYMBOL",
           "name": "_literal"
         },
         {
@@ -2343,8 +2444,21 @@
                     "content": {
                       "type": "REPEAT1",
                       "content": {
-                        "type": "SYMBOL",
-                        "name": "dimensions_expr"
+                        "type": "CHOICE",
+                        "members": [
+                          {
+                            "type": "SYMBOL",
+                            "name": "dimensions_expr"
+                          },
+                          {
+                            "type": "SYMBOL",
+                            "name": "shisho_ellipsis"
+                          },
+                          {
+                            "type": "SYMBOL",
+                            "name": "shisho_ellipsis_metavariable"
+                          }
+                        ]
                       }
                     }
                   },
@@ -2398,8 +2512,21 @@
         {
           "type": "REPEAT",
           "content": {
-            "type": "SYMBOL",
-            "name": "_annotation"
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "_annotation"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "shisho_ellipsis"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "shisho_ellipsis_metavariable"
+              }
+            ]
           }
         },
         {
@@ -2549,6 +2676,10 @@
               {
                 "type": "SYMBOL",
                 "name": "super"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "shisho_metavariable"
               }
             ]
           }
@@ -2587,6 +2718,10 @@
               {
                 "type": "SYMBOL",
                 "name": "identifier"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "shisho_metavariable"
               },
               {
                 "type": "SYMBOL",
@@ -2644,6 +2779,10 @@
                 "members": [
                   {
                     "type": "SYMBOL",
+                    "name": "shisho_metavariable"
+                  },
+                  {
+                    "type": "SYMBOL",
                     "name": "identifier"
                   },
                   {
@@ -2669,6 +2808,10 @@
                       {
                         "type": "SYMBOL",
                         "name": "super"
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "shisho_metavariable"
                       }
                     ]
                   }
@@ -2722,6 +2865,10 @@
                     "members": [
                       {
                         "type": "SYMBOL",
+                        "name": "shisho_metavariable"
+                      },
+                      {
+                        "type": "SYMBOL",
                         "name": "identifier"
                       },
                       {
@@ -2759,8 +2906,21 @@
               "type": "SEQ",
               "members": [
                 {
-                  "type": "SYMBOL",
-                  "name": "expression"
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "SYMBOL",
+                      "name": "shisho_ellipsis"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "shisho_ellipsis_metavariable"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "expression"
+                    }
+                  ]
                 },
                 {
                   "type": "REPEAT",
@@ -2772,8 +2932,21 @@
                         "value": ","
                       },
                       {
-                        "type": "SYMBOL",
-                        "name": "expression"
+                        "type": "CHOICE",
+                        "members": [
+                          {
+                            "type": "SYMBOL",
+                            "name": "shisho_ellipsis"
+                          },
+                          {
+                            "type": "SYMBOL",
+                            "name": "shisho_ellipsis_metavariable"
+                          },
+                          {
+                            "type": "SYMBOL",
+                            "name": "expression"
+                          }
+                        ]
                       }
                     ]
                   }
@@ -2808,6 +2981,10 @@
             {
               "type": "SYMBOL",
               "name": "super"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "shisho_metavariable"
             }
           ]
         },
@@ -2837,6 +3014,10 @@
             {
               "type": "SYMBOL",
               "name": "identifier"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "shisho_metavariable"
             }
           ]
         }
@@ -2865,6 +3046,14 @@
                     {
                       "type": "SYMBOL",
                       "name": "wildcard"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "shisho_ellipsis"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "shisho_ellipsis_metavariable"
                     }
                   ]
                 },
@@ -2887,6 +3076,14 @@
                           {
                             "type": "SYMBOL",
                             "name": "wildcard"
+                          },
+                          {
+                            "type": "SYMBOL",
+                            "name": "shisho_ellipsis"
+                          },
+                          {
+                            "type": "SYMBOL",
+                            "name": "shisho_ellipsis_metavariable"
                           }
                         ]
                       }
@@ -2971,22 +3168,35 @@
       "content": {
         "type": "REPEAT1",
         "content": {
-          "type": "SEQ",
+          "type": "CHOICE",
           "members": [
             {
-              "type": "REPEAT",
-              "content": {
-                "type": "SYMBOL",
-                "name": "_annotation"
-              }
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "REPEAT",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "_annotation"
+                  }
+                },
+                {
+                  "type": "STRING",
+                  "value": "["
+                },
+                {
+                  "type": "STRING",
+                  "value": "]"
+                }
+              ]
             },
             {
-              "type": "STRING",
-              "value": "["
+              "type": "SYMBOL",
+              "name": "shisho_ellipsis"
             },
             {
-              "type": "STRING",
-              "value": "]"
+              "type": "SYMBOL",
+              "name": "shisho_ellipsis_metavariable"
             }
           ]
         }
@@ -3058,15 +3268,28 @@
           {
             "type": "REPEAT1",
             "content": {
-              "type": "SEQ",
+              "type": "CHOICE",
               "members": [
                 {
-                  "type": "SYMBOL",
-                  "name": "switch_label"
+                  "type": "SEQ",
+                  "members": [
+                    {
+                      "type": "SYMBOL",
+                      "name": "switch_label"
+                    },
+                    {
+                      "type": "STRING",
+                      "value": ":"
+                    }
+                  ]
                 },
                 {
-                  "type": "STRING",
-                  "value": ":"
+                  "type": "SYMBOL",
+                  "name": "shisho_ellipsis"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "shisho_ellipsis_metavariable"
                 }
               ]
             }
@@ -3074,8 +3297,21 @@
           {
             "type": "REPEAT",
             "content": {
-              "type": "SYMBOL",
-              "name": "statement"
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "statement"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "shisho_ellipsis"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "shisho_ellipsis_metavariable"
+                }
+              ]
             }
           }
         ]
@@ -3125,8 +3361,21 @@
               "type": "SEQ",
               "members": [
                 {
-                  "type": "SYMBOL",
-                  "name": "expression"
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "SYMBOL",
+                      "name": "expression"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "shisho_ellipsis"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "shisho_ellipsis_metavariable"
+                    }
+                  ]
                 },
                 {
                   "type": "REPEAT",
@@ -3138,8 +3387,21 @@
                         "value": ","
                       },
                       {
-                        "type": "SYMBOL",
-                        "name": "expression"
+                        "type": "CHOICE",
+                        "members": [
+                          {
+                            "type": "SYMBOL",
+                            "name": "expression"
+                          },
+                          {
+                            "type": "SYMBOL",
+                            "name": "shisho_ellipsis"
+                          },
+                          {
+                            "type": "SYMBOL",
+                            "name": "shisho_ellipsis_metavariable"
+                          }
+                        ]
                       }
                     ]
                   }
@@ -3157,6 +3419,10 @@
     "statement": {
       "type": "CHOICE",
       "members": [
+        {
+          "type": "SYMBOL",
+          "name": "shisho_metavariable"
+        },
         {
           "type": "SYMBOL",
           "name": "declaration"
@@ -3253,8 +3519,21 @@
         {
           "type": "REPEAT",
           "content": {
-            "type": "SYMBOL",
-            "name": "statement"
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "statement"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "shisho_ellipsis"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "shisho_ellipsis_metavariable"
+              }
+            ]
           }
         },
         {
@@ -3280,8 +3559,17 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "SYMBOL",
-          "name": "identifier"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "identifier"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "shisho_metavariable"
+            }
+          ]
         },
         {
           "type": "STRING",
@@ -3384,8 +3672,17 @@
           "type": "CHOICE",
           "members": [
             {
-              "type": "SYMBOL",
-              "name": "identifier"
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "identifier"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "shisho_metavariable"
+                }
+              ]
             },
             {
               "type": "BLANK"
@@ -3409,8 +3706,17 @@
           "type": "CHOICE",
           "members": [
             {
-              "type": "SYMBOL",
-              "name": "identifier"
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "identifier"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "shisho_metavariable"
+                }
+              ]
             },
             {
               "type": "BLANK"
@@ -3695,8 +4001,21 @@
           "type": "SEQ",
           "members": [
             {
-              "type": "SYMBOL",
-              "name": "resource"
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "resource"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "shisho_ellipsis"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "shisho_ellipsis_metavariable"
+                }
+              ]
             },
             {
               "type": "REPEAT",
@@ -3708,8 +4027,21 @@
                     "value": ";"
                   },
                   {
-                    "type": "SYMBOL",
-                    "name": "resource"
+                    "type": "CHOICE",
+                    "members": [
+                      {
+                        "type": "SYMBOL",
+                        "name": "resource"
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "shisho_ellipsis"
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "shisho_ellipsis_metavariable"
+                      }
+                    ]
                   }
                 ]
               }
@@ -3779,8 +4111,17 @@
           ]
         },
         {
-          "type": "SYMBOL",
-          "name": "identifier"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "identifier"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "shisho_metavariable"
+            }
+          ]
         },
         {
           "type": "SYMBOL",
@@ -4082,6 +4423,10 @@
       "members": [
         {
           "type": "SYMBOL",
+          "name": "shisho_metavariable"
+        },
+        {
+          "type": "SYMBOL",
           "name": "marker_annotation"
         },
         {
@@ -4153,8 +4498,21 @@
                   "type": "SEQ",
                   "members": [
                     {
-                      "type": "SYMBOL",
-                      "name": "element_value_pair"
+                      "type": "CHOICE",
+                      "members": [
+                        {
+                          "type": "SYMBOL",
+                          "name": "element_value_pair"
+                        },
+                        {
+                          "type": "SYMBOL",
+                          "name": "shisho_ellipsis"
+                        },
+                        {
+                          "type": "SYMBOL",
+                          "name": "shisho_ellipsis_metavariable"
+                        }
+                      ]
                     },
                     {
                       "type": "REPEAT",
@@ -4166,8 +4524,21 @@
                             "value": ","
                           },
                           {
-                            "type": "SYMBOL",
-                            "name": "element_value_pair"
+                            "type": "CHOICE",
+                            "members": [
+                              {
+                                "type": "SYMBOL",
+                                "name": "element_value_pair"
+                              },
+                              {
+                                "type": "SYMBOL",
+                                "name": "shisho_ellipsis"
+                              },
+                              {
+                                "type": "SYMBOL",
+                                "name": "shisho_ellipsis_metavariable"
+                              }
+                            ]
                           }
                         ]
                       }
@@ -4194,8 +4565,17 @@
           "type": "FIELD",
           "name": "key",
           "content": {
-            "type": "SYMBOL",
-            "name": "identifier"
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "identifier"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "shisho_metavariable"
+              }
+            ]
           }
         },
         {
@@ -4247,8 +4627,21 @@
               "type": "SEQ",
               "members": [
                 {
-                  "type": "SYMBOL",
-                  "name": "_element_value"
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "SYMBOL",
+                      "name": "_element_value"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "shisho_ellipsis"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "shisho_ellipsis_metavariable"
+                    }
+                  ]
                 },
                 {
                   "type": "REPEAT",
@@ -4260,8 +4653,21 @@
                         "value": ","
                       },
                       {
-                        "type": "SYMBOL",
-                        "name": "_element_value"
+                        "type": "CHOICE",
+                        "members": [
+                          {
+                            "type": "SYMBOL",
+                            "name": "_element_value"
+                          },
+                          {
+                            "type": "SYMBOL",
+                            "name": "shisho_ellipsis"
+                          },
+                          {
+                            "type": "SYMBOL",
+                            "name": "shisho_ellipsis_metavariable"
+                          }
+                        ]
                       }
                     ]
                   }
@@ -4382,8 +4788,21 @@
         {
           "type": "REPEAT",
           "content": {
-            "type": "SYMBOL",
-            "name": "module_directive"
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "module_directive"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "shisho_ellipsis"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "shisho_ellipsis_metavariable"
+              }
+            ]
           }
         },
         {
@@ -4696,8 +5115,17 @@
           "type": "FIELD",
           "name": "name",
           "content": {
-            "type": "SYMBOL",
-            "name": "identifier"
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "identifier"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "shisho_metavariable"
+              }
+            ]
           }
         },
         {
@@ -4740,8 +5168,21 @@
               "type": "SEQ",
               "members": [
                 {
-                  "type": "SYMBOL",
-                  "name": "enum_constant"
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "SYMBOL",
+                      "name": "enum_constant"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "shisho_ellipsis_metavariable"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "shisho_ellipsis"
+                    }
+                  ]
                 },
                 {
                   "type": "REPEAT",
@@ -4753,8 +5194,21 @@
                         "value": ","
                       },
                       {
-                        "type": "SYMBOL",
-                        "name": "enum_constant"
+                        "type": "CHOICE",
+                        "members": [
+                          {
+                            "type": "SYMBOL",
+                            "name": "enum_constant"
+                          },
+                          {
+                            "type": "SYMBOL",
+                            "name": "shisho_ellipsis_metavariable"
+                          },
+                          {
+                            "type": "SYMBOL",
+                            "name": "shisho_ellipsis"
+                          }
+                        ]
                       }
                     ]
                   }
@@ -4831,8 +5285,17 @@
           "type": "FIELD",
           "name": "name",
           "content": {
-            "type": "SYMBOL",
-            "name": "identifier"
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "identifier"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "shisho_metavariable"
+              }
+            ]
           }
         },
         {
@@ -4892,8 +5355,17 @@
           "type": "FIELD",
           "name": "name",
           "content": {
-            "type": "SYMBOL",
-            "name": "identifier"
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "identifier"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "shisho_metavariable"
+              }
+            ]
           }
         },
         {
@@ -4961,6 +5433,18 @@
         "members": [
           {
             "type": "SYMBOL",
+            "name": "shisho_ellipsis"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "shisho_ellipsis_metavariable"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "shisho_metavariable"
+          },
+          {
+            "type": "SYMBOL",
             "name": "_annotation"
           },
           {
@@ -5025,8 +5509,21 @@
           "type": "SEQ",
           "members": [
             {
-              "type": "SYMBOL",
-              "name": "type_parameter"
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "type_parameter"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "shisho_ellipsis"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "shisho_metavariable"
+                }
+              ]
             },
             {
               "type": "REPEAT",
@@ -5038,8 +5535,21 @@
                     "value": ","
                   },
                   {
-                    "type": "SYMBOL",
-                    "name": "type_parameter"
+                    "type": "CHOICE",
+                    "members": [
+                      {
+                        "type": "SYMBOL",
+                        "name": "type_parameter"
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "shisho_ellipsis"
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "shisho_metavariable"
+                      }
+                    ]
                   }
                 ]
               }
@@ -5063,8 +5573,17 @@
           }
         },
         {
-          "type": "SYMBOL",
-          "name": "identifier"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "identifier"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "shisho_metavariable"
+            }
+          ]
         },
         {
           "type": "CHOICE",
@@ -5101,8 +5620,21 @@
                 "value": "&"
               },
               {
-                "type": "SYMBOL",
-                "name": "_type"
+                "type": "CHOICE",
+                "members": [
+                  {
+                    "type": "SYMBOL",
+                    "name": "_type"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "shisho_ellipsis"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "shisho_ellipsis_metavariable"
+                  }
+                ]
               }
             ]
           }
@@ -5152,8 +5684,21 @@
                 "value": ","
               },
               {
-                "type": "SYMBOL",
-                "name": "_type"
+                "type": "CHOICE",
+                "members": [
+                  {
+                    "type": "SYMBOL",
+                    "name": "_type"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "shisho_ellipsis"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "shisho_ellipsis_metavariable"
+                  }
+                ]
               }
             ]
           }
@@ -5342,8 +5887,21 @@
         {
           "type": "REPEAT",
           "content": {
-            "type": "SYMBOL",
-            "name": "statement"
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "statement"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "shisho_ellipsis"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "shisho_ellipsis_metavariable"
+              }
+            ]
           }
         },
         {
@@ -5463,6 +6021,10 @@
       "members": [
         {
           "type": "SYMBOL",
+          "name": "shisho_metavariable"
+        },
+        {
+          "type": "SYMBOL",
           "name": "identifier"
         },
         {
@@ -5494,8 +6056,17 @@
           "type": "FIELD",
           "name": "name",
           "content": {
-            "type": "SYMBOL",
-            "name": "identifier"
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "identifier"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "shisho_metavariable"
+              }
+            ]
           }
         }
       ]
@@ -5556,8 +6127,17 @@
           "type": "FIELD",
           "name": "name",
           "content": {
-            "type": "SYMBOL",
-            "name": "identifier"
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "identifier"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "shisho_metavariable"
+              }
+            ]
           }
         },
         {
@@ -5601,8 +6181,17 @@
           "type": "FIELD",
           "name": "name",
           "content": {
-            "type": "SYMBOL",
-            "name": "identifier"
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "identifier"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "shisho_metavariable"
+              }
+            ]
           }
         },
         {
@@ -5627,6 +6216,18 @@
           "content": {
             "type": "CHOICE",
             "members": [
+              {
+                "type": "SYMBOL",
+                "name": "shisho_ellipsis"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "shisho_ellipsis_metavariable"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "shisho_metavariable"
+              },
               {
                 "type": "SYMBOL",
                 "name": "annotation_type_element_declaration"
@@ -5683,8 +6284,17 @@
           "type": "FIELD",
           "name": "name",
           "content": {
-            "type": "SYMBOL",
-            "name": "identifier"
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "identifier"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "shisho_metavariable"
+              }
+            ]
           }
         },
         {
@@ -5769,8 +6379,17 @@
           "type": "FIELD",
           "name": "name",
           "content": {
-            "type": "SYMBOL",
-            "name": "identifier"
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "identifier"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "shisho_metavariable"
+              }
+            ]
           }
         },
         {
@@ -5836,6 +6455,18 @@
           "content": {
             "type": "CHOICE",
             "members": [
+              {
+                "type": "SYMBOL",
+                "name": "shisho_ellipsis"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "shisho_ellipsis_metavariable"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "shisho_metavariable"
+              },
               {
                 "type": "SYMBOL",
                 "name": "constant_declaration"
@@ -5984,6 +6615,10 @@
             "members": [
               {
                 "type": "SYMBOL",
+                "name": "shisho_metavariable"
+              },
+              {
+                "type": "SYMBOL",
                 "name": "identifier"
               },
               {
@@ -6038,8 +6673,21 @@
               "type": "SEQ",
               "members": [
                 {
-                  "type": "SYMBOL",
-                  "name": "_variable_initializer"
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "SYMBOL",
+                      "name": "_variable_initializer"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "shisho_ellipsis"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "shisho_ellipsis_metavariable"
+                    }
+                  ]
                 },
                 {
                   "type": "REPEAT",
@@ -6051,8 +6699,21 @@
                         "value": ","
                       },
                       {
-                        "type": "SYMBOL",
-                        "name": "_variable_initializer"
+                        "type": "CHOICE",
+                        "members": [
+                          {
+                            "type": "SYMBOL",
+                            "name": "_variable_initializer"
+                          },
+                          {
+                            "type": "SYMBOL",
+                            "name": "shisho_ellipsis"
+                          },
+                          {
+                            "type": "SYMBOL",
+                            "name": "shisho_ellipsis_metavariable"
+                          }
+                        ]
                       }
                     ]
                   }
@@ -6085,6 +6746,10 @@
     "_type": {
       "type": "CHOICE",
       "members": [
+        {
+          "type": "SYMBOL",
+          "name": "shisho_metavariable"
+        },
         {
           "type": "SYMBOL",
           "name": "_unannotated_type"
@@ -6128,13 +6793,22 @@
           "name": "boolean_type"
         },
         {
-          "type": "ALIAS",
-          "content": {
-            "type": "SYMBOL",
-            "name": "identifier"
-          },
-          "named": true,
-          "value": "type_identifier"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "ALIAS",
+              "content": {
+                "type": "SYMBOL",
+                "name": "identifier"
+              },
+              "named": true,
+              "value": "type_identifier"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "shisho_metavariable"
+            }
+          ]
         },
         {
           "type": "SYMBOL",
@@ -6169,13 +6843,22 @@
           "type": "CHOICE",
           "members": [
             {
-              "type": "ALIAS",
-              "content": {
-                "type": "SYMBOL",
-                "name": "identifier"
-              },
-              "named": true,
-              "value": "type_identifier"
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "ALIAS",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "identifier"
+                  },
+                  "named": true,
+                  "value": "type_identifier"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "shisho_metavariable"
+                }
+              ]
             },
             {
               "type": "SYMBOL",
@@ -6199,13 +6882,22 @@
           }
         },
         {
-          "type": "ALIAS",
-          "content": {
-            "type": "SYMBOL",
-            "name": "identifier"
-          },
-          "named": true,
-          "value": "type_identifier"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "ALIAS",
+              "content": {
+                "type": "SYMBOL",
+                "name": "identifier"
+              },
+              "named": true,
+              "value": "type_identifier"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "shisho_metavariable"
+            }
+          ]
         }
       ]
     },
@@ -6219,13 +6911,22 @@
             "type": "CHOICE",
             "members": [
               {
-                "type": "ALIAS",
-                "content": {
-                  "type": "SYMBOL",
-                  "name": "identifier"
-                },
-                "named": true,
-                "value": "type_identifier"
+                "type": "CHOICE",
+                "members": [
+                  {
+                    "type": "ALIAS",
+                    "content": {
+                      "type": "SYMBOL",
+                      "name": "identifier"
+                    },
+                    "named": true,
+                    "value": "type_identifier"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "shisho_metavariable"
+                  }
+                ]
               },
               {
                 "type": "SYMBOL",
@@ -6376,6 +7077,10 @@
               {
                 "type": "SYMBOL",
                 "name": "identifier"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "shisho_metavariable"
               },
               {
                 "type": "SYMBOL",
@@ -6536,8 +7241,17 @@
               "type": "SEQ",
               "members": [
                 {
-                  "type": "SYMBOL",
-                  "name": "identifier"
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "SYMBOL",
+                      "name": "identifier"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "shisho_metavariable"
+                    }
+                  ]
                 },
                 {
                   "type": "STRING",
@@ -6596,8 +7310,21 @@
           "type": "SEQ",
           "members": [
             {
-              "type": "SYMBOL",
-              "name": "_type"
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "_type"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "shisho_ellipsis"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "shisho_ellipsis_metavariable"
+                }
+              ]
             },
             {
               "type": "REPEAT",
@@ -6609,8 +7336,21 @@
                     "value": ","
                   },
                   {
-                    "type": "SYMBOL",
-                    "name": "_type"
+                    "type": "CHOICE",
+                    "members": [
+                      {
+                        "type": "SYMBOL",
+                        "name": "_type"
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "shisho_ellipsis"
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "shisho_ellipsis_metavariable"
+                      }
+                    ]
                   }
                 ]
               }
